@@ -147,7 +147,9 @@ def main():
     out, err = process.communicate()
     logging.debug(out)
     args.uri = out.strip()
-
+  else:
+    args.uri = args.uri[0]
+    
   for tv in tvs:
     message = AVTransportTemplate.replace("$DIDL", didl_lite).replace("$$$URI$$$", args.uri).replace("$$$APIURL$$$", tv["url"])
     logging.debug(message)
