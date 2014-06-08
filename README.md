@@ -8,6 +8,16 @@ Prerequisites
 
 Python 2.7, should come preinstalled with OS X and most Linux distributions. Optionally, youtube-dl.
 
+Installation
+------------
+
+Just download and make executable. This is just one Python file.
+
+```
+wget https://raw.githubusercontent.com/probonopd/video2smarttv/master/video2smarttv.py
+chmod a+x ./video2smarttv.py
+````
+
 Usage
 -----
 
