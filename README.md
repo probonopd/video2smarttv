@@ -1,7 +1,7 @@
 video2smarttv
 =============
 
-Send mp4 video URLs or YouTube videos to Samsung Smart TV. This is a no-frills implementation intended to be as lightweight and portable as possible. Hence, it does not use any XML, SOAP, or uPNP libraries. Might work with other UPnP Smart TVs too.
+Send mp4 video URLs or YouTube videos to Samsung Smart TV using UPnP, DLNA. This is a no-frills implementation intended to be as lightweight and portable as possible. Hence, it does not use any XML, SOAP, or UPnP libraries. Might work with other UPnP Smart TVs too.
 
 Prerequisites
 -------------
