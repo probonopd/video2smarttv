@@ -5,13 +5,33 @@
 # Send mp4 streaming media URIs to Samsung Smart TV for immediate playback
 #
 
-import os, socket, argparse, logging, subprocess, cgi
+import os, socket, argparse, logging, subprocess, cgi, httplib, StringIO, urllib2, re, urlparse
 
 #
-# Defaults
+# Function to discover services on the network using SSDP
+# Inspired by https://gist.github.com/dankrause/6000248
 #
 
-port = 7676
+class SsdpFakeSocket(StringIO.StringIO):
+     def makefile(self, *args, **kw): return self
+
+def ssdp_discover(service):
+    group = ("239.255.255.250", 1900)
+    message = "\r\n".join(['M-SEARCH * HTTP/1.1', 'HOST: {0}:{1}', 'MAN: "ssdp:discover"', 'ST: {st}','MX: 3','',''])
+    socket.setdefaulttimeout(0.5)
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 2)
+    sock.sendto(message.format(*group, st=service), group)
+    results = []
+    while True:
+        try:
+            r = httplib.HTTPResponse(SsdpFakeSocket(sock.recv(1024))) 
+            r.begin()
+            results.append(r.getheader("location"))
+        except socket.timeout:
+            break
+    return results
 
 #
 # DIDL-Lite template
@@ -34,7 +54,7 @@ didl_lite = ' '.join(cgi.escape(didl_lite_template.replace("\n","")).split())
 # or if we do not use .replace("\n", "\r\n") to get "CRLF line terminators"
 #
 
-AVTransportTemplate = """POST /smp_22_ HTTP/1.1
+AVTransportTemplate = """POST $$$APIURL$$$ HTTP/1.1
 Accept: application/json, text/plain, */*
 Soapaction: "urn:schemas-upnp-org:service:AVTransport:1#SetAVTransportURI"
 Content-Type: text/xml;charset="UTF-8"
@@ -50,7 +70,7 @@ Content-Type: text/xml;charset="UTF-8"
   </s:Body>
 </s:Envelope>"""
 
-PlayTemplate = """POST /smp_22_ HTTP/1.1
+PlayTemplate = """POST $$$APIURL$$$ HTTP/1.1
 Accept: application/json, text/plain, */*
 Soapaction: "urn:schemas-upnp-org:service:AVTransport:1#Play"
 Content-Type: text/xml;charset="UTF-8"
@@ -90,15 +110,29 @@ def main():
   parser = argparse.ArgumentParser(description='Send mp4 video streams to a Samsung Smart TV', add_help = True)
   flags = parser.add_argument_group('Arguments')
   parser.add_argument("-v", "--verbose", help="Verbose output, print requests and responses", action="store_true")
-  flags.add_argument('-i', '--ip', dest = 'ip', default = None, help = 'Required. IP Address of the TV', required = True)
-  flags.add_argument('-p', '--port', dest = 'port', default = port, type = int, help = 'Optional. Port of the TV')
-  flags.add_argument('uri', default = None, help = 'Required. URI to be sent to TV. If this does not start with http, it is sent to yt-downloader for processing.')
+  flags.add_argument('uri', nargs='+', default = None, help = 'Required. URI to be sent to TV. If this does not start with http, it is sent to yt-downloader for processing.')
 
   args = parser.parse_args()
   if args.verbose:
     logging.basicConfig(level=logging.DEBUG)
 
-  if not (args.uri.startswith("http")):
+  # Find TV devices using SSDP   
+  tvs = []
+  results = ssdp_discover("urn:schemas-upnp-org:service:AVTransport:1")
+  for result in results:
+    logging.debug(result)
+    data = urllib2.urlopen(result).read()
+    # logging.debug(data) 
+    expr = re.compile(r"urn:upnp-org:serviceId:AVTransport.*<controlURL>(.*)</controlURL>", re.DOTALL)
+    regexresult = expr.findall(data)
+    logging.debug(regexresult)
+    o = urlparse.urlparse(result)
+    tv = {"ip": o.hostname, "port": o.port, "url": regexresult[0]}
+    logging.debug(tv)
+    tvs.append(tv)
+
+  # Do a search if required
+  if not (args.uri[0].startswith("http")):
     myexec = "youtube-dl"
     try:
       FNULL = open(os.devnull, 'w')
@@ -107,20 +141,19 @@ def main():
       print "%s is not installed." % myexec
       print "Install it in order to be able to search YouTube."
       exit(1)
-    command = ["youtube-dl", "-g", "--default-search", "auto", args.uri]
+    command = ["youtube-dl", "-g", "--default-search", "auto", " ".join(args.uri)]
     logging.debug(command)
     process = subprocess.Popen(command, stdout=subprocess.PIPE)
     out, err = process.communicate()
     logging.debug(out)
     args.uri = out.strip()
 
-  message = AVTransportTemplate.replace("$DIDL", didl_lite).replace("$$$URI$$$", args.uri)
-  logging.debug(message)
-  sendMessage(args.ip, args.port, message)
-
-  message = PlayTemplate
-  logging.debug(message)
-  sendMessage(args.ip, args.port, message)
+  for tv in tvs:
+    message = AVTransportTemplate.replace("$DIDL", didl_lite).replace("$$$URI$$$", args.uri).replace("$$$APIURL$$$", tv["url"])
+    logging.debug(message)
+    sendMessage(tv["ip"], tv["port"], message)
+    message = PlayTemplate.replace("$$$APIURL$$$", tv["url"])
+    logging.debug(message)
+    sendMessage(tv["ip"], tv["port"], message)
   
 main()
-
