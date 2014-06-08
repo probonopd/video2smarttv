@@ -1,12 +1,17 @@
 video2smarttv
 =============
 
-Send mp4 video URLs or YouTube videos to Samsung Smart TV. Might work with other UPnP Smart TVs too.
+Send mp4 video URLs or YouTube videos to Samsung Smart TV. This is a no-frills implementation intended to be as lightweight and portable as possible. Hence, it does not use any XML, SOAP, or uPNP libraries. Might work with other UPnP Smart TVs too.
+
+Prerequisites
+-------------
+
+Python 2.7, should come preinstalled with OS X and most Linux distributions. Optionally, youtube-dl.
 
 Usage
 -----
 
-Send a mp4 video file to the Smart TV for playing:
+Send a mp4 video file to the Smart TV for playing by specifying the IP address of the TV and the URL to be played:
 
 ```
 ./sendSamsungVideo.py -i 192.168.0.13 http://download.wavetlan.com/SVV/Media/HTTP/H264/Talkinghead_Media/H264_test1_Talkinghead_mp4_480x360.mp4
