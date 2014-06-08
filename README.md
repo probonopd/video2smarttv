@@ -1,7 +1,7 @@
 video2smarttv
 =============
 
-Send video url to Samsung Smart TV. Might work with other UPnP Smart TVs too.
+Send mp4 video URLs or YouTube videos to Samsung Smart TV. Might work with other UPnP Smart TVs too.
 
 Usage
 -----
