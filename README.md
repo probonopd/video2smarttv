@@ -18,7 +18,6 @@ wget https://raw.githubusercontent.com/probonopd/video2smarttv/master/video2smar
 chmod a+x ./video2smarttv.py
 sudo wget https://yt-dl.org/downloads/2014.06.07/youtube-dl -O /usr/local/bin/youtube-dl # Optional
 sudo chmod a+x /usr/local/bin/youtube-dl # Optional
-
 ````
 
 Usage
