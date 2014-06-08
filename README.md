@@ -6,7 +6,7 @@ Send mp4 video URLs or YouTube videos to Samsung Smart TV using UPnP, DLNA. This
 Prerequisites
 -------------
 
-Python 2.7, should come preinstalled with OS X and most Linux distributions. Optionally, youtube-dl.
+Python 2.7, should come preinstalled with OS X and most Linux distributions. Optionally, [youtube-dl](http://rg3.github.io/youtube-dl/download.html).
 
 Installation
 ------------
