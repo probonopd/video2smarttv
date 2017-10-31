@@ -141,7 +141,7 @@ def main():
       print "%s is not installed." % myexec
       print "Install it in order to be able to search YouTube."
       exit(1)
-    command = ["youtube-dl", "-g", "--default-search", "auto", " ".join(args.uri)]
+    command = ["youtube-dl", "-f", "mp4", "-g", "--default-search", "auto", " ".join(args.uri)]
     logging.debug(command)
     process = subprocess.Popen(command, stdout=subprocess.PIPE)
     out, err = process.communicate()
