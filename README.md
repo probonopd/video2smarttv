@@ -16,8 +16,8 @@ Just download and make executable. This is just one Python file.
 ```
 wget https://raw.githubusercontent.com/probonopd/video2smarttv/master/video2smarttv.py
 chmod a+x ./video2smarttv.py
-sudo wget https://yt-dl.org/downloads/2014.06.07/youtube-dl -O /usr/local/bin/youtube-dl # Optional
-sudo chmod a+x /usr/local/bin/youtube-dl # Optional
+sudo wget https://yt-dl.org/downloads/latest/youtube-dl -O /usr/local/bin/youtube-dl # Optional
+sudo chmod a+rx /usr/local/bin/youtube-dl # Optional
 ````
 
 Usage
