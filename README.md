@@ -26,12 +26,12 @@ Usage
 Send a mp4 video file to the Smart TV for playing by specifying the IP address of the TV and the URL to be played:
 
 ```
-./video2smarttv.py http://download.wavetlan.com/SVV/Media/HTTP/H264/Talkinghead_Media/H264_test1_Talkinghead_mp4_480x360.mp4
+./video2smarttv.py http://techslides.com/demos/sample-videos/small.mp4
 ````
 
 If you have youtube-dl installed, you can also use YouTube IDs or search keywords instead:
 
 ```
-./video2smarttv.py pf7BWCbGmVs
+./video2smarttv.py BaW_jenozKc
 ./video2smarttv.py some youtube search
 ```
